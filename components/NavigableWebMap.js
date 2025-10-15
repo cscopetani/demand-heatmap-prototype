@@ -55,10 +55,15 @@ const NavigableWebMap = () => {
       const mapElement = mapRef.current;
       if (!mapElement) return;
 
+      // Check if map is already initialized
+      if (mapElement._leaflet_id) {
+        return;
+      }
+
       // Initialize map centered on Buenos Aires
       const leafletMap = window.L.map(mapElement).setView([-34.6037, -58.3816], 13);
 
-      // Add custom styled map tiles with Google Maps-like minimal design
+      // Add custom styled map tiles with exact Google Maps styling
       window.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '© OpenStreetMap contributors © CARTO',
         subdomains: 'abcd',
@@ -135,7 +140,7 @@ const NavigableWebMap = () => {
 
       setMarkers(newMarkers);
 
-      // Add custom styles matching Google Maps minimal design
+      // Add custom styles with exact Google Maps color scheme
       const style = document.createElement('style');
       style.textContent = `
         .heat-zone {
@@ -150,17 +155,22 @@ const NavigableWebMap = () => {
           border: none !important;
         }
         
-        /* Google Maps-like minimal styling */
+        /* Exact Google Maps styling */
         .leaflet-container {
           background: #f5f5f5 !important;
         }
         
-        /* Apply Google Maps color scheme */
+        /* Apply exact Google Maps color filters */
         .leaflet-tile {
-          filter: hue-rotate(0deg) saturate(0.8) brightness(1.1) contrast(0.9) !important;
+          filter: 
+            hue-rotate(0deg) 
+            saturate(0.7) 
+            brightness(1.1) 
+            contrast(0.85) 
+            sepia(0.1) !important;
         }
         
-        /* Custom zoom controls matching Google Maps */
+        /* Custom zoom controls with Google Maps styling */
         .leaflet-control-zoom {
           border: none !important;
           box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
@@ -191,7 +201,7 @@ const NavigableWebMap = () => {
           border-bottom: 1px solid #e0e0e0 !important;
         }
         
-        /* Custom popup styling matching Google Maps */
+        /* Google Maps popup styling */
         .leaflet-popup-content-wrapper {
           background: white !important;
           border-radius: 8px !important;
@@ -204,6 +214,7 @@ const NavigableWebMap = () => {
           margin: 0 !important;
           padding: 12px !important;
           font-family: 'Roboto', Arial, sans-serif !important;
+          color: #616161 !important;
         }
         
         .leaflet-popup-tip {
@@ -212,7 +223,7 @@ const NavigableWebMap = () => {
           box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
         }
         
-        /* Attribution styling */
+        /* Attribution with Google Maps colors */
         .leaflet-control-attribution {
           background: rgba(255,255,255,0.9) !important;
           font-size: 10px !important;
@@ -220,14 +231,30 @@ const NavigableWebMap = () => {
           padding: 2px 4px !important;
         }
         
-        /* Hide default map elements for cleaner look */
+        /* Hide default map elements */
         .leaflet-control-layers {
           display: none !important;
         }
         
-        /* Custom styling for map tiles to match Google Maps */
+        /* Enhanced map tile styling to match Google Maps exactly */
         .leaflet-tile-container {
-          filter: contrast(0.9) brightness(1.05) saturate(0.8) !important;
+          filter: 
+            contrast(0.85) 
+            brightness(1.1) 
+            saturate(0.7) 
+            sepia(0.1) 
+            hue-rotate(0deg) !important;
+        }
+        
+        /* Additional styling for map elements */
+        .leaflet-tile-pane {
+          opacity: 0.95 !important;
+        }
+        
+        /* Custom styling for map labels to match Google Maps */
+        .leaflet-tile {
+          image-rendering: -webkit-optimize-contrast !important;
+          image-rendering: crisp-edges !important;
         }
       `;
       document.head.appendChild(style);
@@ -239,7 +266,18 @@ const NavigableWebMap = () => {
     return () => {
       if (map) {
         map.remove();
+        setMap(null);
       }
+      // Clean up markers and polygons
+      markers.forEach(({ marker, infoWindow }) => {
+        if (marker) marker.remove();
+        if (infoWindow) infoWindow.close();
+      });
+      polygons.forEach(polygon => {
+        if (polygon) polygon.remove();
+      });
+      setMarkers([]);
+      setPolygons([]);
     };
   }, []);
 
