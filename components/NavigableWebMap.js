@@ -79,7 +79,7 @@ const NavigableWebMap = () => {
       const hexPolygons = hexGridData.map((hex) => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
         const polygon = window.L.polygon(coordinates, {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: 'rgba(255, 255, 255, 0.8)',
           weight: 1,
           fillColor: getHexColor(hex.level),
           fillOpacity: getIntensity(hex.intensity),

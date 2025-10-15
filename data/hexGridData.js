@@ -1,12 +1,13 @@
-// Función para generar coordenadas de hexágono
+// Función para generar coordenadas de hexágono perfecto
 const createHexagon = (centerLat, centerLng, radiusKm) => {
   const earthRadius = 6371; // Radio de la Tierra en km
   const lat = centerLat * Math.PI / 180;
   const lng = centerLng * Math.PI / 180;
   
   const hexPoints = [];
+  // Generar 6 vértices del hexágono, empezando desde el vértice superior
   for (let i = 0; i < 6; i++) {
-    const angle = (i * 60) * Math.PI / 180;
+    const angle = (i * 60 - 30) * Math.PI / 180; // -30 para empezar desde arriba
     const newLat = Math.asin(Math.sin(lat) * Math.cos(radiusKm / earthRadius) + 
                            Math.cos(lat) * Math.sin(radiusKm / earthRadius) * Math.cos(angle));
     const newLng = lng + Math.atan2(Math.sin(angle) * Math.sin(radiusKm / earthRadius) * Math.cos(lat),
@@ -26,19 +27,31 @@ export const hexGridData = [];
 // Centro de Buenos Aires
 const centerLat = -34.6037;
 const centerLng = -58.3816;
-const hexRadius = 0.8; // Radio del hexágono en km
+const hexRadius = 0.5; // Radio del hexágono en km (reducido para mejor ajuste)
 
 // Crear malla hexagonal
 for (let row = 0; row < 14; row++) {
   for (let col = 0; col < 12; col++) {
     const id = row * 12 + col + 1;
     
-    // Calcular posición del hexágono
-    const x = col * hexRadius * 1.5;
-    const y = row * hexRadius * Math.sqrt(3);
+    // Calcular posición del hexágono con espaciado perfecto
+    const hexWidth = hexRadius * 2; // Ancho del hexágono
+    const hexHeight = hexRadius * Math.sqrt(3); // Altura del hexágono
     
-    // Offset para filas impares (patrón de panal)
-    const offsetX = (row % 2) * hexRadius * 0.75;
+    // Espaciado horizontal: 3/4 del ancho del hexágono
+    const horizontalSpacing = hexWidth * 0.75;
+    
+    // Espaciado vertical: altura completa del hexágono
+    const verticalSpacing = hexHeight;
+    
+    // Posición X: espaciado horizontal
+    const x = col * horizontalSpacing;
+    
+    // Posición Y: espaciado vertical
+    const y = row * verticalSpacing;
+    
+    // Offset para filas impares (patrón de panal de abeja)
+    const offsetX = (row % 2) * (horizontalSpacing / 2);
     
     // Convertir a coordenadas lat/lng
     const lat = centerLat + (y / 111); // 1 grado ≈ 111 km
