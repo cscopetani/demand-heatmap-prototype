@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { heatZoneData } from '../data/heatZones';
 import { poiData } from '../data/poiData';
+import { hexGridData } from '../data/hexGridData';
 
 // Función auxiliar para elegir el color del marcador
 const getMarkerColor = (demand) => {
@@ -26,6 +27,7 @@ const NavigableWebMap = () => {
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [polygons, setPolygons] = useState([]);
+  const [hexagons, setHexagons] = useState([]);
 
   useEffect(() => {
     // Load Leaflet CSS and JS
@@ -72,6 +74,30 @@ const NavigableWebMap = () => {
 
       setMap(leafletMap);
 
+      // Add hexagonal grid for Palermo
+      const hexPolygons = hexGridData.map((hex) => {
+        const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
+        const polygon = window.L.polygon(coordinates, {
+          color: 'rgba(255, 255, 255, 0.3)',
+          weight: 1,
+          fillColor: getMarkerColor(hex.demand),
+          fillOpacity: hex.intensity * 0.6 + 0.2, // Opacidad basada en intensidad
+          className: 'hex-cell'
+        });
+
+        polygon.bindPopup(`
+          <div style="padding: 8px; font-family: Arial, sans-serif;">
+            <h3 style="margin: 0 0 4px 0; color: #333;">Zona ${hex.demand} Demanda</h3>
+            <p style="margin: 0; color: #666; font-size: 12px;">
+              Intensidad: ${Math.round(hex.intensity * 100)}% • ID: ${hex.id}
+            </p>
+          </div>
+        `);
+
+        polygon.addTo(leafletMap);
+        return polygon;
+      });
+
       // Add heat zones (polygons)
       const newPolygons = heatZoneData.map((zone) => {
         const coordinates = zone.coordinates.map(coord => [coord.latitude, coord.longitude]);
@@ -97,6 +123,7 @@ const NavigableWebMap = () => {
       });
 
       setPolygons(newPolygons);
+      setHexagons(hexPolygons);
 
       // Add POI markers
       const newMarkers = poiData.map((poi) => {
@@ -153,6 +180,17 @@ const NavigableWebMap = () => {
         .custom-marker {
           background: transparent !important;
           border: none !important;
+        }
+        
+        /* Hexagonal grid styling */
+        .hex-cell {
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .hex-cell:hover {
+          fill-opacity: 0.9 !important;
+          stroke: rgba(255, 255, 255, 0.8) !important;
+          stroke-width: 2 !important;
         }
         
         /* Exact Google Maps styling */
@@ -268,7 +306,7 @@ const NavigableWebMap = () => {
         map.remove();
         setMap(null);
       }
-      // Clean up markers and polygons
+      // Clean up markers, polygons and hexagons
       markers.forEach(({ marker, infoWindow }) => {
         if (marker) marker.remove();
         if (infoWindow) infoWindow.close();
@@ -276,8 +314,12 @@ const NavigableWebMap = () => {
       polygons.forEach(polygon => {
         if (polygon) polygon.remove();
       });
+      hexagons.forEach(hexagon => {
+        if (hexagon) hexagon.remove();
+      });
       setMarkers([]);
       setPolygons([]);
+      setHexagons([]);
     };
   }, []);
 
@@ -300,6 +342,11 @@ const NavigableWebMap = () => {
           <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
           <Text style={styles.legendText}>Baja Demanda</Text>
         </View>
+        <View style={styles.legendDivider} />
+        <Text style={styles.legendSubtitle}>Malla Hexagonal</Text>
+        <Text style={styles.legendDescription}>
+          Celdas hexagonales muestran demanda granular en Palermo
+        </Text>
       </View>
 
       {/* Controls */}
@@ -353,6 +400,22 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#666',
+  },
+  legendDivider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 8,
+  },
+  legendSubtitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  legendDescription: {
+    fontSize: 10,
+    color: '#666',
+    lineHeight: 14,
   },
   controls: {
     position: 'absolute',
