@@ -28,6 +28,31 @@ const NavigableWebMap = () => {
   const [markers, setMarkers] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [hexagons, setHexagons] = useState([]);
+  const [currentZoom, setCurrentZoom] = useState(13);
+
+  // Función para calcular transparencia basada en zoom
+  const getOpacityFromZoom = (zoom) => {
+    // Zoom 10-12: Opacidad alta (0.7-0.9)
+    // Zoom 13-15: Opacidad media (0.4-0.6) 
+    // Zoom 16+: Opacidad baja (0.1-0.3)
+    if (zoom <= 12) return 0.8;
+    if (zoom <= 14) return 0.5;
+    if (zoom <= 16) return 0.3;
+    return 0.1;
+  };
+
+  // Función para actualizar opacidad de hexágonos
+  const updateHexagonOpacity = (zoom) => {
+    const opacity = getOpacityFromZoom(zoom);
+    hexagons.forEach(hexagon => {
+      if (hexagon) {
+        hexagon.setStyle({
+          fillOpacity: opacity,
+          opacity: opacity
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     // Load Leaflet CSS and JS
@@ -74,15 +99,26 @@ const NavigableWebMap = () => {
 
       setMap(leafletMap);
 
+      // Add zoom event listener
+      leafletMap.on('zoomend', () => {
+        const zoom = leafletMap.getZoom();
+        setCurrentZoom(zoom);
+        updateHexagonOpacity(zoom);
+      });
+
       // Add POI-centered hexagonal heat zones
       console.log('Renderizando hexágonos centrados en POIs:', poiHexData.length);
+      const initialZoom = leafletMap.getZoom();
+      const initialOpacity = getOpacityFromZoom(initialZoom);
+      
       const hexPolygons = poiHexData.map((hex) => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
         const polygon = window.L.polygon(coordinates, {
           color: 'rgba(255, 255, 255, 0.8)',
           weight: 2,
           fillColor: getHexColor(hex.level),
-          fillOpacity: getIntensity(hex.intensity),
+          fillOpacity: getIntensity(hex.intensity) * initialOpacity,
+          opacity: initialOpacity,
           className: 'heat-zone-hex'
         });
 
@@ -327,6 +363,11 @@ const NavigableWebMap = () => {
         <Text style={styles.legendDescription}>
           Centrados en puntos de interés
         </Text>
+        <View style={styles.legendDivider} />
+        <Text style={styles.legendSubtitle}>Zoom: {currentZoom}</Text>
+        <Text style={styles.legendDescription}>
+          Transparencia adaptativa al zoom
+        </Text>
       </View>
 
       {/* Controls */}
@@ -335,6 +376,11 @@ const NavigableWebMap = () => {
         <Text style={styles.controlsText}>• Arrastra para navegar</Text>
         <Text style={styles.controlsText}>• Rueda del mouse para zoom</Text>
         <Text style={styles.controlsText}>• Click en zonas/marcadores</Text>
+        <View style={styles.legendDivider} />
+        <Text style={styles.controlsTitle}>Transparencia</Text>
+        <Text style={styles.controlsText}>• Zoom 10-12: Opacidad alta</Text>
+        <Text style={styles.controlsText}>• Zoom 13-15: Opacidad media</Text>
+        <Text style={styles.controlsText}>• Zoom 16+: Opacidad baja</Text>
       </View>
     </View>
   );
