@@ -29,6 +29,7 @@ const NavigableWebMap = () => {
   const [polygons, setPolygons] = useState([]);
   const [hexagons, setHexagons] = useState([]);
   const [currentZoom, setCurrentZoom] = useState(13);
+  const [userLocation, setUserLocation] = useState(null); // Simulated user location
 
   // Función para calcular transparencia basada en zoom
   const getOpacityFromZoom = (zoom) => {
@@ -52,6 +53,18 @@ const NavigableWebMap = () => {
         });
       }
     });
+  };
+
+  // Función para simular geolocalización en Palermo
+  const simulateUserLocation = () => {
+    // Coordenadas de Palermo, Buenos Aires
+    const palermoLocation = {
+      latitude: -34.5800,
+      longitude: -58.4200,
+      accuracy: 10
+    };
+    setUserLocation(palermoLocation);
+    return palermoLocation;
   };
 
   useEffect(() => {
@@ -181,6 +194,57 @@ const NavigableWebMap = () => {
 
       setMarkers(newMarkers);
 
+      // Add simulated user location marker in Palermo
+      const userLocation = simulateUserLocation();
+      const userMarker = window.L.marker([userLocation.latitude, userLocation.longitude], {
+        icon: window.L.divIcon({
+          className: 'user-location-marker',
+          html: `
+            <div style="
+              background-color: #4285F4;
+              width: 20px;
+              height: 20px;
+              border-radius: 10px;
+              border: 3px solid white;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              color: white;
+              font-weight: bold;
+              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+              cursor: pointer;
+              animation: pulse 2s infinite;
+            ">
+              📍
+            </div>
+            <style>
+              @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+              }
+            </style>
+          `,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        })
+      });
+
+      userMarker.bindPopup(`
+        <div style="padding: 8px; font-family: Arial, sans-serif;">
+          <h3 style="margin: 0 0 4px 0; color: #333;">📍 Tu ubicación</h3>
+          <p style="margin: 0; color: #666; font-size: 12px;">
+            Palermo, Buenos Aires
+          </p>
+          <p style="margin: 4px 0 0 0; color: #999; font-size: 10px;">
+            Ubicación simulada
+          </p>
+        </div>
+      `);
+
+      userMarker.addTo(leafletMap);
+
       // Add custom styles with exact Google Maps color scheme
       const style = document.createElement('style');
       style.textContent = `
@@ -192,6 +256,11 @@ const NavigableWebMap = () => {
           fill-opacity: 0.9 !important;
         }
         .custom-marker {
+          background: transparent !important;
+          border: none !important;
+        }
+
+        .user-location-marker {
           background: transparent !important;
           border: none !important;
         }
@@ -361,6 +430,11 @@ const NavigableWebMap = () => {
         <Text style={styles.legendSubtitle}>10 Hexágonos</Text>
         <Text style={styles.legendDescription}>
           Centrados en puntos de interés
+        </Text>
+        <View style={styles.legendDivider} />
+        <Text style={styles.legendSubtitle}>📍 Ubicación</Text>
+        <Text style={styles.legendDescription}>
+          Marcador azul en Palermo
         </Text>
         <View style={styles.legendDivider} />
         <Text style={styles.legendSubtitle}>Zoom: {currentZoom}</Text>
