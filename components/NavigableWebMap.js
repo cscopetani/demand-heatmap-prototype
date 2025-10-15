@@ -32,13 +32,13 @@ const NavigableWebMap = () => {
 
   // Función para calcular transparencia basada en zoom
   const getOpacityFromZoom = (zoom) => {
-    // Zoom 10-12: Opacidad alta (0.7-0.9)
-    // Zoom 13-15: Opacidad media (0.4-0.6) 
-    // Zoom 16+: Opacidad baja (0.1-0.3)
-    if (zoom <= 12) return 0.8;
-    if (zoom <= 14) return 0.5;
-    if (zoom <= 16) return 0.3;
-    return 0.1;
+    // Zoom 10-12: Opacidad alta (0.8-0.9) - Vista general
+    // Zoom 13-15: Opacidad media (0.4-0.6) - Vista intermedia
+    // Zoom 16+: Opacidad baja (0.1-0.2) - Vista detallada
+    if (zoom <= 12) return 0.8;  // Vista general - hexágonos bien visibles
+    if (zoom <= 14) return 0.4;  // Vista intermedia - opacidad media
+    if (zoom <= 16) return 0.2;  // Vista detallada - muy transparente
+    return 0.1;                   // Zoom máximo - casi invisible
   };
 
   // Función para actualizar opacidad de hexágonos
@@ -378,9 +378,10 @@ const NavigableWebMap = () => {
         <Text style={styles.controlsText}>• Click en zonas/marcadores</Text>
         <View style={styles.legendDivider} />
         <Text style={styles.controlsTitle}>Transparencia</Text>
-        <Text style={styles.controlsText}>• Zoom 10-12: Opacidad alta</Text>
-        <Text style={styles.controlsText}>• Zoom 13-15: Opacidad media</Text>
-        <Text style={styles.controlsText}>• Zoom 16+: Opacidad baja</Text>
+        <Text style={styles.controlsText}>• Zoom 10-12: Opacidad alta (80%)</Text>
+        <Text style={styles.controlsText}>• Zoom 13-14: Opacidad media (40%)</Text>
+        <Text style={styles.controlsText}>• Zoom 15-16: Opacidad baja (20%)</Text>
+        <Text style={styles.controlsText}>• Zoom 17+: Muy transparente (10%)</Text>
       </View>
     </View>
   );
