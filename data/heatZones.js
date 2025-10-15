@@ -8,8 +8,8 @@ const generateHexagon = (centerLat, centerLng, radius) => {
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
     
-    const lat = centerLat + (y * 0.0001);
-    const lng = centerLng + (x * 0.0001);
+    const lat = centerLat + (y * 0.001);
+    const lng = centerLng + (x * 0.001);
     coordinates.push({ latitude: lat, longitude: lng });
   }
   
@@ -22,8 +22,8 @@ const generateHoneycombGrid = (centerLat, centerLng) => {
   const rows = 12;
   const cols = 14;
   
-  // Radio del hexágono (basado en las dimensiones CSS)
-  const hexRadius = 0.003; // Radio en grados geográficos
+  // Radio del hexágono (aumentado para visibilidad)
+  const hexRadius = 0.01; // Radio en grados geográficos
   
   // Espaciado para panal de abeja perfecto
   const hexWidth = hexRadius * 2; // Ancho del hexágono
