@@ -80,10 +80,10 @@ const NavigableWebMap = () => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
         console.log('Hexágono coordenadas:', coordinates);
         const polygon = window.L.polygon(coordinates, {
-          color: 'rgba(255, 255, 255, 0.8)',
-          weight: 2,
+          color: '#FFFFFF',
+          weight: 3,
           fillColor: getMarkerColor(hex.level),
-          fillOpacity: hex.intensity * 0.6 + 0.3,
+          fillOpacity: 0.8,
           className: 'heat-zone-hex'
         });
 
