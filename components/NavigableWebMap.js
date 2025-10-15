@@ -301,7 +301,7 @@ const NavigableWebMap = () => {
         
         /* Additional styling for map elements */
         .leaflet-tile-pane {
-          opacity: 0.95 !important;
+          opacity: 1.0 !important;
         }
         
         /* Custom styling for map labels to match Google Maps */
