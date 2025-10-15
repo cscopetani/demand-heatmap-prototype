@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import NavigableWebMap from './components/NavigableWebMap';
+import AbsoluteHexGrid from './components/AbsoluteHexGrid';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <NavigableWebMap />
+      <AbsoluteHexGrid />
       <StatusBar style="auto" />
     </View>
   );
