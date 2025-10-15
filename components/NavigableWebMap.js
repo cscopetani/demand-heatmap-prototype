@@ -74,16 +74,15 @@ const NavigableWebMap = () => {
 
       setMap(leafletMap);
 
-      // Add hexagonal grid from heatZoneData
+      // Add hexagonal grid from heatZoneData (168 hexágonos)
       console.log('Renderizando hexágonos:', heatZoneData.length);
       const hexPolygons = heatZoneData.map((hex) => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
-        console.log('Hexágono coordenadas:', coordinates);
         const polygon = window.L.polygon(coordinates, {
-          color: '#FFFFFF',
-          weight: 3,
+          color: 'rgba(255, 255, 255, 0.8)',
+          weight: 2,
           fillColor: getMarkerColor(hex.level),
-          fillOpacity: 0.8,
+          fillOpacity: hex.intensity * 0.6 + 0.3,
           className: 'heat-zone-hex'
         });
 
@@ -360,9 +359,9 @@ const NavigableWebMap = () => {
           <Text style={styles.legendText}>Baja Demanda</Text>
         </View>
         <View style={styles.legendDivider} />
-        <Text style={styles.legendSubtitle}>Patrón Panal de Abeja</Text>
+        <Text style={styles.legendSubtitle}>Malla Hexagonal 12x14</Text>
         <Text style={styles.legendDescription}>
-          Hexágonos interconectados muestran demanda granular en toda la ciudad
+          168 hexágonos muestran demanda granular en Buenos Aires
         </Text>
       </View>
 

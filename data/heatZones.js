@@ -1,65 +1,95 @@
-// Función para generar coordenadas de hexágono
-const generateHexagon = (centerLat, centerLng, radius) => {
+// Función para generar coordenadas de hexágono (rotado 90 grados)
+const generateHexagon = (centerLat, centerLng, width, height) => {
   const coordinates = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i;
-    const lat = centerLat + (radius * Math.cos(angle));
-    const lng = centerLng + (radius * Math.sin(angle));
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  
+  // Hexágono rotado 90 grados (más alto que ancho)
+  const points = [
+    { x: 0, y: -halfHeight },           // Top
+    { x: halfWidth * 0.866, y: -halfHeight * 0.5 },  // Top-right
+    { x: halfWidth * 0.866, y: halfHeight * 0.5 },   // Bottom-right
+    { x: 0, y: halfHeight },            // Bottom
+    { x: -halfWidth * 0.866, y: halfHeight * 0.5 },  // Bottom-left
+    { x: -halfWidth * 0.866, y: -halfHeight * 0.5 }  // Top-left
+  ];
+  
+  for (const point of points) {
+    const lat = centerLat + (point.y * 0.0001);
+    const lng = centerLng + (point.x * 0.0001);
     coordinates.push({ latitude: lat, longitude: lng });
   }
+  
   return coordinates;
 };
 
-// Función para generar malla hexagonal de panal de abeja
-const generateHoneycombGrid = (centerLat, centerLng, gridSize, hexRadius) => {
+// Función para generar malla hexagonal basada en el patrón CSS (12x14)
+const generateHoneycombGrid = (centerLat, centerLng) => {
   const hexagons = [];
-  const hexHeight = hexRadius * Math.sqrt(3);
-  const hexWidth = hexRadius * 2;
+  const rows = 12;
+  const cols = 14;
+  const hexWidth = 63.26;
+  const hexHeight = 73.05;
   
-  for (let row = 0; row < gridSize; row++) {
-    for (let col = 0; col < gridSize; col++) {
-      const x = col * hexWidth * 0.75;
-      const y = row * hexHeight + (col % 2) * hexHeight / 2;
+  // Conversión de píxeles a coordenadas geográficas
+  const latStep = 0.0008;  // Ajuste para el espaciado vertical
+  const lngStep = 0.0006;  // Ajuste para el espaciado horizontal
+  
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      // Patrón de offset para hexágonos (cada fila alterna)
+      const offsetX = (row % 2) * (hexWidth * 0.5);
+      const x = col * hexWidth + offsetX;
+      const y = row * hexHeight;
       
-      const lat = centerLat + (y * 0.0005);
-      const lng = centerLng + (x * 0.0005);
+      const lat = centerLat + (y * latStep);
+      const lng = centerLng + (x * lngStep);
       
-          // Asignar demanda basada en posición en la grilla
-          let demand = 'Baja';
-          let intensity = 0.3;
-
-          // Alta demanda en el centro-norte (simulando Palermo)
-          if (row <= 2 && col >= 2 && col <= 4) {
-            demand = 'Alta';
-            intensity = 0.7 + Math.random() * 0.3;
-          }
-          // Media demanda en el centro-este (simulando Puerto Madero)
-          else if (row >= 2 && row <= 4 && col >= 3) {
-            demand = 'Media';
-            intensity = 0.5 + Math.random() * 0.3;
-          }
-          // Media demanda en el centro-oeste (simulando Recoleta)
-          else if (row >= 1 && row <= 3 && col <= 2) {
-            demand = 'Media';
-            intensity = 0.4 + Math.random() * 0.3;
-          }
-          // Baja demanda en los bordes
-          else {
-            demand = 'Baja';
-            intensity = 0.2 + Math.random() * 0.2;
-          }
+      // Asignar demanda basada en el patrón del CSS
+      let demand = 'Baja';
+      let intensity = 0.3;
+      
+      // Patrón de demanda basado en la posición
+      if (row <= 3) {
+        // Filas superiores - Alta demanda
+        if (col >= 2 && col <= 5) {
+          demand = 'Alta';
+          intensity = 0.7 + Math.random() * 0.3;
+        } else if (col >= 6 && col <= 9) {
+          demand = 'Media';
+          intensity = 0.5 + Math.random() * 0.3;
+        }
+      } else if (row >= 4 && row <= 7) {
+        // Filas medias - Distribución mixta
+        if (col <= 3) {
+          demand = 'Media';
+          intensity = 0.4 + Math.random() * 0.3;
+        } else if (col >= 4 && col <= 7) {
+          demand = 'Alta';
+          intensity = 0.6 + Math.random() * 0.3;
+        } else {
+          demand = 'Media';
+          intensity = 0.5 + Math.random() * 0.3;
+        }
+      } else {
+        // Filas inferiores - Baja demanda
+        demand = 'Baja';
+        intensity = 0.2 + Math.random() * 0.2;
+      }
       
       hexagons.push({
-        id: `heat_hex_${row}_${col}`,
+        id: `hex_${row}_${col}`,
         level: demand,
         color: getDemandColor(demand, intensity),
-        coordinates: generateHexagon(lat, lng, hexRadius),
+        coordinates: generateHexagon(lat, lng, hexWidth, hexHeight),
         intensity: intensity,
-        center: { latitude: lat, longitude: lng }
+        center: { latitude: lat, longitude: lng },
+        width: hexWidth,
+        height: hexHeight
       });
     }
   }
-  
+
   return hexagons;
 };
 
@@ -77,13 +107,20 @@ const getDemandColor = (demand, intensity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-// Generar malla hexagonal para Buenos Aires
+// Generar malla hexagonal para Buenos Aires (12x14 = 168 hexágonos)
 const buenosAiresCenter = { lat: -34.6037, lng: -58.3816 };
-export const heatZoneData = generateHoneycombGrid(buenosAiresCenter.lat, buenosAiresCenter.lng, 6, 0.02);
+export const heatZoneData = generateHoneycombGrid(buenosAiresCenter.lat, buenosAiresCenter.lng);
 
 // Debug: Log para verificar que se generan los hexágonos
 console.log('Hexágonos generados:', heatZoneData.length);
 if (heatZoneData.length > 0) {
   console.log('Primer hexágono:', heatZoneData[0]);
-  console.log('Coordenadas del primer hexágono:', heatZoneData[0].coordinates);
+  console.log('Último hexágono:', heatZoneData[heatZoneData.length - 1]);
+  
+  // Distribución por nivel
+  const distribution = heatZoneData.reduce((acc, hex) => {
+    acc[hex.level] = (acc[hex.level] || 0) + 1;
+    return acc;
+  }, {});
+  console.log('Distribución de demanda:', distribution);
 }
