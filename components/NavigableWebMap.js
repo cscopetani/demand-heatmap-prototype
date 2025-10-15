@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { heatZoneData } from '../data/heatZones';
 import { poiData } from '../data/poiData';
-import { hexGridData, getHexColor, getIntensity } from '../data/hexGridData';
+import { poiHexData, getHexColor, getIntensity } from '../data/poiHexData';
 
 // Función auxiliar para elegir el color del marcador
 const getMarkerColor = (demand) => {
@@ -74,13 +74,13 @@ const NavigableWebMap = () => {
 
       setMap(leafletMap);
 
-      // Add hexagonal grid heat zones
-      console.log('Renderizando hexágonos:', hexGridData.length);
-      const hexPolygons = hexGridData.map((hex) => {
+      // Add POI-centered hexagonal heat zones
+      console.log('Renderizando hexágonos centrados en POIs:', poiHexData.length);
+      const hexPolygons = poiHexData.map((hex) => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
         const polygon = window.L.polygon(coordinates, {
           color: 'rgba(255, 255, 255, 0.8)',
-          weight: 1,
+          weight: 2,
           fillColor: getHexColor(hex.level),
           fillOpacity: getIntensity(hex.intensity),
           className: 'heat-zone-hex'
@@ -88,12 +88,12 @@ const NavigableWebMap = () => {
 
         polygon.bindPopup(`
           <div style="padding: 8px; font-family: Arial, sans-serif;">
-            <h3 style="margin: 0 0 4px 0; color: #333;">Hexágono ${hex.level} Demanda</h3>
+            <h3 style="margin: 0 0 4px 0; color: #333;">${hex.poiName}</h3>
             <p style="margin: 0; color: #666; font-size: 12px;">
-              Intensidad: ${Math.round(hex.intensity * 100)}% • ID: ${hex.id}
+              ${hex.level} Demanda • Intensidad: ${Math.round(hex.intensity * 100)}%
             </p>
             <p style="margin: 4px 0 0 0; color: #999; font-size: 10px;">
-              Fila: ${hex.row} • Col: ${hex.col}
+              Zona de influencia del POI
             </p>
           </div>
         `);
@@ -309,7 +309,7 @@ const NavigableWebMap = () => {
       
       {/* Legend */}
       <View style={styles.legend}>
-        <Text style={styles.legendTitle}>Niveles de Demanda</Text>
+        <Text style={styles.legendTitle}>Zonas de Influencia POI</Text>
         <View style={styles.legendItem}>
           <View style={[styles.legendColor, { backgroundColor: '#F44336' }]} />
           <Text style={styles.legendText}>Alta Demanda</Text>
@@ -323,9 +323,9 @@ const NavigableWebMap = () => {
           <Text style={styles.legendText}>Baja Demanda</Text>
         </View>
         <View style={styles.legendDivider} />
-        <Text style={styles.legendSubtitle}>Malla Hexagonal 12x14</Text>
+        <Text style={styles.legendSubtitle}>10 Hexágonos</Text>
         <Text style={styles.legendDescription}>
-          168 hexágonos muestran demanda granular en Buenos Aires
+          Centrados en puntos de interés
         </Text>
       </View>
 
