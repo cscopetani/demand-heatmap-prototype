@@ -74,20 +74,22 @@ const NavigableWebMap = () => {
 
       setMap(leafletMap);
 
-      // Add hexagonal grid for Palermo
-      const hexPolygons = hexGridData.map((hex) => {
+      // Add hexagonal grid from heatZoneData
+      console.log('Renderizando hexágonos:', heatZoneData.length);
+      const hexPolygons = heatZoneData.map((hex) => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
+        console.log('Hexágono coordenadas:', coordinates);
         const polygon = window.L.polygon(coordinates, {
-          color: 'rgba(255, 255, 255, 0.3)',
-          weight: 1,
-          fillColor: getMarkerColor(hex.demand),
-          fillOpacity: hex.intensity * 0.6 + 0.2, // Opacidad basada en intensidad
-          className: 'hex-cell'
+          color: 'rgba(255, 255, 255, 0.8)',
+          weight: 2,
+          fillColor: getMarkerColor(hex.level),
+          fillOpacity: hex.intensity * 0.6 + 0.3,
+          className: 'heat-zone-hex'
         });
 
         polygon.bindPopup(`
           <div style="padding: 8px; font-family: Arial, sans-serif;">
-            <h3 style="margin: 0 0 4px 0; color: #333;">Zona ${hex.demand} Demanda</h3>
+            <h3 style="margin: 0 0 4px 0; color: #333;">Zona ${hex.level} Demanda</h3>
             <p style="margin: 0; color: #666; font-size: 12px;">
               Intensidad: ${Math.round(hex.intensity * 100)}% • ID: ${hex.id}
             </p>

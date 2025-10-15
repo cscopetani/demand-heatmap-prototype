@@ -58,7 +58,7 @@ const generateHoneycombGrid = (centerLat, centerLng, gridSize, hexRadius) => {
         id: `heat_hex_${row}_${col}`,
         level: demand,
         color: getDemandColor(demand, intensity),
-        coordinates: generateHexagon(lat, lng, hexRadius * 0.0001),
+        coordinates: generateHexagon(lat, lng, hexRadius),
         intensity: intensity,
         center: { latitude: lat, longitude: lng }
       });
@@ -84,4 +84,8 @@ const getDemandColor = (demand, intensity) => {
 
 // Generar malla hexagonal para Buenos Aires
 const buenosAiresCenter = { lat: -34.6037, lng: -58.3816 };
-export const heatZoneData = generateHoneycombGrid(buenosAiresCenter.lat, buenosAiresCenter.lng, 12, 0.003);
+export const heatZoneData = generateHoneycombGrid(buenosAiresCenter.lat, buenosAiresCenter.lng, 8, 0.01);
+
+// Debug: Log para verificar que se generan los hexágonos
+console.log('Hexágonos generados:', heatZoneData.length);
+console.log('Primer hexágono:', heatZoneData[0]);
