@@ -98,22 +98,25 @@ const NavigableWebMap = () => {
         return polygon;
       });
 
-      // Add heat zones (polygons)
+      // Add heat zones (hexagonal honeycomb)
       const newPolygons = heatZoneData.map((zone) => {
         const coordinates = zone.coordinates.map(coord => [coord.latitude, coord.longitude]);
         const polygon = window.L.polygon(coordinates, {
-          color: 'rgba(255, 255, 255, 0.8)',
-          weight: 2,
+          color: 'rgba(255, 255, 255, 0.4)',
+          weight: 1,
           fillColor: zone.color,
-          fillOpacity: 0.7,
-          className: 'heat-zone'
+          fillOpacity: zone.intensity || 0.6,
+          className: 'heat-zone-hex'
         });
 
         polygon.bindPopup(`
           <div style="padding: 8px; font-family: Arial, sans-serif;">
-            <h3 style="margin: 0 0 4px 0; color: #333;">Zona de ${zone.level} Demanda</h3>
+            <h3 style="margin: 0 0 4px 0; color: #333;">Hexágono ${zone.level} Demanda</h3>
             <p style="margin: 0; color: #666; font-size: 12px;">
-              Nivel: ${zone.level} • ID: ${zone.id}
+              Intensidad: ${Math.round((zone.intensity || 0.6) * 100)}% • ID: ${zone.id}
+            </p>
+            <p style="margin: 4px 0 0 0; color: #999; font-size: 10px;">
+              Patrón de panal de abeja
             </p>
           </div>
         `);
@@ -191,6 +194,18 @@ const NavigableWebMap = () => {
           fill-opacity: 0.9 !important;
           stroke: rgba(255, 255, 255, 0.8) !important;
           stroke-width: 2 !important;
+        }
+        
+        /* Heat zone hexagonal styling */
+        .heat-zone-hex {
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .heat-zone-hex:hover {
+          fill-opacity: 0.9 !important;
+          stroke: rgba(255, 255, 255, 0.9) !important;
+          stroke-width: 2 !important;
+          filter: brightness(1.1) !important;
         }
         
         /* Exact Google Maps styling */
@@ -343,9 +358,9 @@ const NavigableWebMap = () => {
           <Text style={styles.legendText}>Baja Demanda</Text>
         </View>
         <View style={styles.legendDivider} />
-        <Text style={styles.legendSubtitle}>Malla Hexagonal</Text>
+        <Text style={styles.legendSubtitle}>Patrón Panal de Abeja</Text>
         <Text style={styles.legendDescription}>
-          Celdas hexagonales muestran demanda granular en Palermo
+          Hexágonos interconectados muestran demanda granular en toda la ciudad
         </Text>
       </View>
 
