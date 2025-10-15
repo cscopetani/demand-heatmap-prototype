@@ -75,26 +75,53 @@ const CSSHexGrid = () => {
           z-index: 1000;
         }
 
-        .hex-grid {
-          display: flex;
-          justify-content: center;
+        #myHexGrid {
+          --gridWidth: 20em;
+          --gridHeight: auto;
+          --columnCount: 5;
+          --rowCount: 14;
+          --hexCount: auto;
+          --hexLayout: row;
+          --gridOrient: vertical;
+          --crop: none;
+          --cropFactor: 1;
+          --hexContent: auto;
+          --hexSize: auto;
+          --hexMargin: 0.5em;
+          --hexShape: hexagon;
+          --hexColor: #48a999;
+          --breakpoints: none;
+          --images: none;
+          
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1000;
         }
 
-        .hex-grid__list {
-          --amount: 5;
+        .hexCrop {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .hexContainer {
+          --amount: var(--columnCount);
           --counter: 1;
           position: relative;
           padding: 0;
           margin: 0;
-          list-style-type: none;
           display: grid;
           grid-template-columns: repeat(var(--amount), 1fr 2fr) 1fr;
-          grid-gap: 2.5rem 5rem;
+          grid-gap: calc(var(--hexMargin) * 2) calc(var(--hexMargin) * 4);
           width: 100%;
           height: 100%;
         }
 
-        .hex-grid__item {
+        .hex {
           position: relative;
           grid-column: 1 / span 3;
           grid-row: calc(var(--counter) + var(--counter)) / span 2;
@@ -104,15 +131,9 @@ const CSSHexGrid = () => {
           transition: transform 0.24s ease-out;
           cursor: pointer;
           pointer-events: auto;
-        }
-
-        .hex-grid__content {
-          position: absolute;
-          height: 100%;
-          width: 100%;
           font-size: 1.125rem;
           color: #111111;
-          background-color: white;
+          background-color: var(--hexColor);
           clip-path: polygon(75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%, 25% 0);
           display: flex;
           flex-direction: column;
@@ -121,175 +142,194 @@ const CSSHexGrid = () => {
           padding: 2rem 25%;
           text-decoration: none;
           text-align: center;
-          transition: transform 0.24s ease-out;
+          margin: var(--hexMargin);
         }
 
         /* 5 columns pattern for large screens */
-        .hex-grid__item:nth-of-type(5n + 1) {
+        .hex:nth-of-type(5n + 1) {
           grid-column: 1 / span 3;
         }
 
-        .hex-grid__item:nth-of-type(5n + 2) {
+        .hex:nth-of-type(5n + 2) {
           grid-column: 3 / span 3;
           grid-row: calc(var(--counter) + var(--counter) - 1) / span 2;
         }
 
-        .hex-grid__item:nth-of-type(5n + 3) {
+        .hex:nth-of-type(5n + 3) {
           grid-column: 5 / span 3;
         }
 
-        .hex-grid__item:nth-of-type(5n + 4) {
+        .hex:nth-of-type(5n + 4) {
           grid-column: 7 / span 3;
           grid-row: calc(var(--counter) + var(--counter) - 1) / span 2;
         }
 
-        .hex-grid__item:nth-of-type(5n + 5) {
+        .hex:nth-of-type(5n + 5) {
           grid-column: 9 / span 3;
         }
 
         /* Rows - counter system */
-        .hex-grid__item:nth-of-type(n + 6) {
+        .hex:nth-of-type(n + 6) {
           --counter: 2;
         }
 
-        .hex-grid__item:nth-of-type(n + 11) {
+        .hex:nth-of-type(n + 11) {
           --counter: 3;
         }
 
-        .hex-grid__item:nth-of-type(n + 16) {
+        .hex:nth-of-type(n + 16) {
           --counter: 4;
         }
 
-        .hex-grid__item:nth-of-type(n + 21) {
+        .hex:nth-of-type(n + 21) {
           --counter: 5;
         }
 
-        .hex-grid__item:nth-of-type(n + 26) {
+        .hex:nth-of-type(n + 26) {
           --counter: 6;
         }
 
-        .hex-grid__item:nth-of-type(n + 31) {
+        .hex:nth-of-type(n + 31) {
           --counter: 7;
         }
 
-        .hex-grid__item:nth-of-type(n + 36) {
+        .hex:nth-of-type(n + 36) {
           --counter: 8;
         }
 
-        .hex-grid__item:nth-of-type(n + 41) {
+        .hex:nth-of-type(n + 41) {
           --counter: 9;
         }
 
-        .hex-grid__item:nth-of-type(n + 46) {
+        .hex:nth-of-type(n + 46) {
           --counter: 10;
         }
 
-        .hex-grid__item:nth-of-type(n + 51) {
+        .hex:nth-of-type(n + 51) {
           --counter: 11;
         }
 
-        .hex-grid__item:nth-of-type(n + 56) {
+        .hex:nth-of-type(n + 56) {
           --counter: 12;
         }
 
-        .hex-grid__item:nth-of-type(n + 61) {
+        .hex:nth-of-type(n + 61) {
           --counter: 13;
         }
 
-        .hex-grid__item:nth-of-type(n + 66) {
+        .hex:nth-of-type(n + 66) {
           --counter: 14;
         }
 
         /* Responsive breakpoints */
         @media screen and (min-width: 1120px) and (max-width: 1439px) {
-          .hex-grid__list {
+          #myHexGrid {
+            --columnCount: 4;
+          }
+          
+          .hexContainer {
             --amount: 4;
             --counter: 1;
           }
           
-          .hex-grid__item:nth-of-type(4n + 1) {
+          .hex:nth-of-type(4n + 1) {
             grid-column: 1 / span 3;
           }
           
-          .hex-grid__item:nth-of-type(4n + 2) {
+          .hex:nth-of-type(4n + 2) {
             grid-column: 3 / span 3;
             grid-row: calc(var(--counter) + var(--counter) - 1) / span 2;
           }
           
-          .hex-grid__item:nth-of-type(4n + 3) {
+          .hex:nth-of-type(4n + 3) {
             grid-column: 5 / span 3;
           }
           
-          .hex-grid__item:nth-of-type(4n + 4) {
+          .hex:nth-of-type(4n + 4) {
             grid-column: 7 / span 3;
             grid-row: calc(var(--counter) + var(--counter) - 1) / span 2;
           }
         }
 
         @media screen and (min-width: 840px) and (max-width: 1119px) {
-          .hex-grid__list {
-            --amount: 3;
-            --counter: 1;
-            grid-gap: 1.5rem 3rem;
+          #myHexGrid {
+            --columnCount: 3;
+            --hexMargin: 0.3em;
           }
           
-          .hex-grid__item:nth-of-type(3n + 1) {
+          .hexContainer {
+            --amount: 3;
+            --counter: 1;
+            grid-gap: calc(var(--hexMargin) * 2) calc(var(--hexMargin) * 3);
+          }
+          
+          .hex:nth-of-type(3n + 1) {
             grid-column: 1 / span 3;
           }
           
-          .hex-grid__item:nth-of-type(3n + 2) {
+          .hex:nth-of-type(3n + 2) {
             grid-column: 3 / span 3;
             grid-row: calc(var(--counter) + var(--counter) - 1) / span 2;
           }
           
-          .hex-grid__item:nth-of-type(3n + 3) {
+          .hex:nth-of-type(3n + 3) {
             grid-column: 5 / span 3;
           }
         }
 
         @media screen and (min-width: 480px) and (max-width: 839px) {
-          .hex-grid__list {
-            --amount: 2;
-            --counter: 1;
-            grid-gap: 1.5rem 3rem;
+          #myHexGrid {
+            --columnCount: 2;
+            --hexMargin: 0.3em;
           }
           
-          .hex-grid__item:nth-of-type(2n + 1) {
+          .hexContainer {
+            --amount: 2;
+            --counter: 1;
+            grid-gap: calc(var(--hexMargin) * 2) calc(var(--hexMargin) * 3);
+          }
+          
+          .hex:nth-of-type(2n + 1) {
             grid-column: 1 / span 3;
           }
           
-          .hex-grid__item:nth-of-type(2n + 2) {
+          .hex:nth-of-type(2n + 2) {
             grid-column: 3 / span 3;
             grid-row: calc(var(--counter) + var(--counter) - 1) / span 2;
           }
         }
 
         @media screen and (max-width: 479px) {
-          .hex-grid__list {
+          #myHexGrid {
+            --columnCount: 1;
+            --hexMargin: 0.2em;
+          }
+          
+          .hexContainer {
             --amount: 1;
-            grid-gap: 1.5rem 3rem;
+            grid-gap: calc(var(--hexMargin) * 2) calc(var(--hexMargin) * 3);
           }
         }
 
-        .hex-grid__item:hover {
+        .hex:hover {
           transform: scale(1.1);
           z-index: 1001;
         }
 
-        .hex-grid__item:hover .hex-grid__content {
-          font-size: 14px;
+        .hex:hover {
+          font-size: 1.25rem;
         }
 
         /* Demand level colors */
-        .hex-grid__item[data-level="Alta"] .hex-grid__content {
+        .hex[data-level="Alta"] {
           background-color: rgba(244, 67, 54, 0.7);
         }
 
-        .hex-grid__item[data-level="Media"] .hex-grid__content {
+        .hex[data-level="Media"] {
           background-color: rgba(255, 152, 0, 0.6);
         }
 
-        .hex-grid__item[data-level="Baja"] .hex-grid__content {
+        .hex[data-level="Baja"] {
           background-color: rgba(76, 175, 80, 0.5);
         }
 
@@ -393,22 +433,22 @@ const CSSHexGrid = () => {
       <div ref={mapRef} style={styles.map} />
       
       {/* Hexagonal Grid Overlay */}
-      <div className="hex-grid">
-        <ul className="hex-grid__list">
-          {hexGridData.map((hex) => (
-            <li 
-              key={hex.id} 
-              className="hex-grid__item"
-              data-level={hex.level}
-              data-intensity={hex.intensity}
-              title={`Hexágono ${hex.id} - ${hex.level} Demanda - ${Math.round(hex.intensity * 100)}%`}
-            >
-              <div className="hex-grid__content">
+      <div id="myHexGrid">
+        <div className="hexCrop">
+          <div className="hexContainer">
+            {hexGridData.map((hex) => (
+              <div 
+                key={hex.id} 
+                className="hex"
+                data-level={hex.level}
+                data-intensity={hex.intensity}
+                title={`Hexágono ${hex.id} - ${hex.level} Demanda - ${Math.round(hex.intensity * 100)}%`}
+              >
                 {hex.id}
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Legend */}
