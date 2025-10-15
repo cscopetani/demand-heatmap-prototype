@@ -46,6 +46,7 @@ const NavigableWebMap = () => {
     const opacity = getOpacityFromZoom(zoom);
     hexagons.forEach(hexagon => {
       if (hexagon) {
+        // Aplicar solo la opacidad del zoom, no multiplicar por intensidad
         hexagon.setStyle({
           fillOpacity: opacity
         });
@@ -116,7 +117,7 @@ const NavigableWebMap = () => {
           color: 'rgba(255, 255, 255, 0.8)',
           weight: 2,
           fillColor: getHexColor(hex.level),
-          fillOpacity: getIntensity(hex.intensity) * initialOpacity,
+          fillOpacity: initialOpacity,
           className: 'heat-zone-hex'
         });
 
