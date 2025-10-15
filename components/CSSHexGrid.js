@@ -100,6 +100,111 @@ const CSSHexGrid = () => {
           height: 100%;
           pointer-events: none;
           z-index: 1000;
+          margin: 2em;
+        }
+
+        /* Column and row specific classes */
+        .c-1 {
+          background-color: red !important;
+        }
+
+        .r-2 {
+          transform: scale(0.8) !important;
+        }
+
+        .c-3.r-1 {
+          opacity: 0.5 !important;
+        }
+
+        /* Additional column classes */
+        .c-2 {
+          background-color: orange !important;
+        }
+
+        .c-3 {
+          background-color: yellow !important;
+        }
+
+        .c-4 {
+          background-color: lightblue !important;
+        }
+
+        .c-5 {
+          background-color: green !important;
+        }
+
+        /* Additional row classes */
+        .r-1 {
+          transform: scale(1.1) !important;
+        }
+
+        .r-3 {
+          transform: scale(0.9) !important;
+        }
+
+        .r-4 {
+          opacity: 0.8 !important;
+        }
+
+        .r-5 {
+          transform: scale(1.05) !important;
+        }
+
+        .r-6 {
+          opacity: 0.9 !important;
+        }
+
+        .r-7 {
+          transform: scale(0.95) !important;
+        }
+
+        .r-8 {
+          opacity: 0.85 !important;
+        }
+
+        .r-9 {
+          transform: scale(1.02) !important;
+        }
+
+        .r-10 {
+          opacity: 0.9 !important;
+        }
+
+        .r-11 {
+          transform: scale(0.98) !important;
+        }
+
+        .r-12 {
+          opacity: 0.88 !important;
+        }
+
+        .r-13 {
+          transform: scale(1.01) !important;
+        }
+
+        .r-14 {
+          opacity: 0.92 !important;
+        }
+
+        /* Combined column and row classes */
+        .c-1.r-1 {
+          background-color: darkred !important;
+          transform: scale(1.2) !important;
+        }
+
+        .c-2.r-2 {
+          background-color: darkorange !important;
+          transform: scale(0.7) !important;
+        }
+
+        .c-4.r-3 {
+          background-color: darkyellow !important;
+          transform: scale(0.8) !important;
+        }
+
+        .c-5.r-4 {
+          background-color: darkgreen !important;
+          opacity: 0.6 !important;
         }
 
         .hexCrop {
@@ -436,17 +541,25 @@ const CSSHexGrid = () => {
       <div id="myHexGrid">
         <div className="hexCrop">
           <div className="hexContainer">
-            {hexGridData.map((hex) => (
-              <div 
-                key={hex.id} 
-                className="hex"
-                data-level={hex.level}
-                data-intensity={hex.intensity}
-                title={`Hexágono ${hex.id} - ${hex.level} Demanda - ${Math.round(hex.intensity * 100)}%`}
-              >
-                {hex.id}
-              </div>
-            ))}
+            {hexGridData.map((hex) => {
+              // Calculate column and row based on hex position
+              const column = ((hex.id - 1) % 5) + 1;
+              const row = Math.floor((hex.id - 1) / 5) + 1;
+              
+              return (
+                <div 
+                  key={hex.id} 
+                  className={`hex c-${column} r-${row}`}
+                  data-level={hex.level}
+                  data-intensity={hex.intensity}
+                  data-column={column}
+                  data-row={row}
+                  title={`Hexágono ${hex.id} - ${hex.level} Demanda - ${Math.round(hex.intensity * 100)}% - Col: ${column}, Fila: ${row}`}
+                >
+                  {hex.id}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
