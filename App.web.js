@@ -1,13 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import CSSHexGrid from './components/CSSHexGrid';
-import './styles/hexGrid.css';
+import NavigableWebMap from './components/NavigableWebMap';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <CSSHexGrid />
+      <NavigableWebMap />
       <StatusBar style="auto" />
     </View>
   );

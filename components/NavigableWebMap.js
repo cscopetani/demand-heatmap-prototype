@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { heatZoneData } from '../data/heatZones';
 import { poiData } from '../data/poiData';
-import { hexGridData } from '../data/hexGridData';
+import { hexGridData, getHexColor, getIntensity } from '../data/hexGridData';
 
 // Función auxiliar para elegir el color del marcador
 const getMarkerColor = (demand) => {
@@ -74,50 +74,26 @@ const NavigableWebMap = () => {
 
       setMap(leafletMap);
 
-      // Add hexagonal grid from heatZoneData (168 hexágonos)
-      console.log('Renderizando hexágonos:', heatZoneData.length);
-      const hexPolygons = heatZoneData.map((hex) => {
+      // Add hexagonal grid heat zones
+      console.log('Renderizando hexágonos:', hexGridData.length);
+      const hexPolygons = hexGridData.map((hex) => {
         const coordinates = hex.coordinates.map(coord => [coord.latitude, coord.longitude]);
         const polygon = window.L.polygon(coordinates, {
-          color: 'rgba(255, 255, 255, 0.8)',
-          weight: 2,
-          fillColor: getMarkerColor(hex.level),
-          fillOpacity: hex.intensity * 0.6 + 0.3,
+          color: 'rgba(255, 255, 255, 0.6)',
+          weight: 1,
+          fillColor: getHexColor(hex.level),
+          fillOpacity: getIntensity(hex.intensity),
           className: 'heat-zone-hex'
         });
 
         polygon.bindPopup(`
           <div style="padding: 8px; font-family: Arial, sans-serif;">
-            <h3 style="margin: 0 0 4px 0; color: #333;">Zona ${hex.level} Demanda</h3>
+            <h3 style="margin: 0 0 4px 0; color: #333;">Hexágono ${hex.level} Demanda</h3>
             <p style="margin: 0; color: #666; font-size: 12px;">
               Intensidad: ${Math.round(hex.intensity * 100)}% • ID: ${hex.id}
             </p>
-          </div>
-        `);
-
-        polygon.addTo(leafletMap);
-        return polygon;
-      });
-
-      // Add heat zones (hexagonal honeycomb)
-      const newPolygons = heatZoneData.map((zone) => {
-        const coordinates = zone.coordinates.map(coord => [coord.latitude, coord.longitude]);
-        const polygon = window.L.polygon(coordinates, {
-          color: 'rgba(255, 255, 255, 0.4)',
-          weight: 1,
-          fillColor: zone.color,
-          fillOpacity: zone.intensity || 0.6,
-          className: 'heat-zone-hex'
-        });
-
-        polygon.bindPopup(`
-          <div style="padding: 8px; font-family: Arial, sans-serif;">
-            <h3 style="margin: 0 0 4px 0; color: #333;">Hexágono ${zone.level} Demanda</h3>
-            <p style="margin: 0; color: #666; font-size: 12px;">
-              Intensidad: ${Math.round((zone.intensity || 0.6) * 100)}% • ID: ${zone.id}
-            </p>
             <p style="margin: 4px 0 0 0; color: #999; font-size: 10px;">
-              Patrón de panal de abeja
+              Fila: ${hex.row} • Col: ${hex.col}
             </p>
           </div>
         `);
@@ -126,7 +102,6 @@ const NavigableWebMap = () => {
         return polygon;
       });
 
-      setPolygons(newPolygons);
       setHexagons(hexPolygons);
 
       // Add POI markers
@@ -187,24 +162,13 @@ const NavigableWebMap = () => {
         }
         
         /* Hexagonal grid styling */
-        .hex-cell {
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        .hex-cell:hover {
-          fill-opacity: 0.9 !important;
-          stroke: rgba(255, 255, 255, 0.8) !important;
-          stroke-width: 2 !important;
-        }
-        
-        /* Heat zone hexagonal styling */
         .heat-zone-hex {
           cursor: pointer;
           transition: all 0.3s ease;
         }
         .heat-zone-hex:hover {
           fill-opacity: 0.9 !important;
-          stroke: rgba(255, 255, 255, 0.9) !important;
+          stroke: rgba(255, 255, 255, 0.8) !important;
           stroke-width: 2 !important;
           filter: brightness(1.1) !important;
         }
