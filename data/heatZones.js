@@ -21,38 +21,33 @@ const generateHoneycombGrid = (centerLat, centerLng, gridSize, hexRadius) => {
       const x = col * hexWidth * 0.75;
       const y = row * hexHeight + (col % 2) * hexHeight / 2;
       
-      const lat = centerLat + (y * 0.0001);
-      const lng = centerLng + (x * 0.0001);
+      const lat = centerLat + (y * 0.0005);
+      const lng = centerLng + (x * 0.0005);
       
-      // Asignar demanda basada en ubicación
-      let demand = 'Baja';
-      let intensity = 0.3;
-      
-      // Palermo - Alta demanda
-      if (lat >= -34.5900 && lat <= -34.5700 && lng >= -58.4200 && lng <= -58.4000) {
-        demand = 'Alta';
-        intensity = 0.7 + Math.random() * 0.3;
-      }
-      // Recoleta - Media demanda
-      else if (lat >= -34.6000 && lat <= -34.5800 && lng >= -58.4100 && lng <= -58.3900) {
-        demand = 'Media';
-        intensity = 0.5 + Math.random() * 0.3;
-      }
-      // Puerto Madero - Alta demanda
-      else if (lat >= -34.6200 && lat <= -34.6000 && lng >= -58.3800 && lng <= -58.3600) {
-        demand = 'Alta';
-        intensity = 0.6 + Math.random() * 0.4;
-      }
-      // San Telmo - Media demanda
-      else if (lat >= -34.6300 && lat <= -34.6100 && lng >= -58.3900 && lng <= -58.3700) {
-        demand = 'Media';
-        intensity = 0.4 + Math.random() * 0.3;
-      }
-      // Barracas - Baja demanda
-      else if (lat >= -34.6600 && lat <= -34.6400 && lng >= -58.3900 && lng <= -58.3700) {
-        demand = 'Baja';
-        intensity = 0.2 + Math.random() * 0.2;
-      }
+          // Asignar demanda basada en posición en la grilla
+          let demand = 'Baja';
+          let intensity = 0.3;
+
+          // Alta demanda en el centro-norte (simulando Palermo)
+          if (row <= 2 && col >= 2 && col <= 4) {
+            demand = 'Alta';
+            intensity = 0.7 + Math.random() * 0.3;
+          }
+          // Media demanda en el centro-este (simulando Puerto Madero)
+          else if (row >= 2 && row <= 4 && col >= 3) {
+            demand = 'Media';
+            intensity = 0.5 + Math.random() * 0.3;
+          }
+          // Media demanda en el centro-oeste (simulando Recoleta)
+          else if (row >= 1 && row <= 3 && col <= 2) {
+            demand = 'Media';
+            intensity = 0.4 + Math.random() * 0.3;
+          }
+          // Baja demanda en los bordes
+          else {
+            demand = 'Baja';
+            intensity = 0.2 + Math.random() * 0.2;
+          }
       
       hexagons.push({
         id: `heat_hex_${row}_${col}`,
