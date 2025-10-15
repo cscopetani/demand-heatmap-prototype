@@ -47,8 +47,7 @@ const NavigableWebMap = () => {
     hexagons.forEach(hexagon => {
       if (hexagon) {
         hexagon.setStyle({
-          fillOpacity: opacity,
-          opacity: opacity
+          fillOpacity: opacity
         });
       }
     });
@@ -118,7 +117,6 @@ const NavigableWebMap = () => {
           weight: 2,
           fillColor: getHexColor(hex.level),
           fillOpacity: getIntensity(hex.intensity) * initialOpacity,
-          opacity: initialOpacity,
           className: 'heat-zone-hex'
         });
 
