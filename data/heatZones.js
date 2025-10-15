@@ -1,49 +1,42 @@
-// Función para generar coordenadas de hexágono (rotado 90 grados)
-const generateHexagon = (centerLat, centerLng, width, height) => {
+// Función para generar coordenadas de hexágono perfecto (panal de abeja)
+const generateHexagon = (centerLat, centerLng, radius) => {
   const coordinates = [];
-  const halfWidth = width / 2;
-  const halfHeight = height / 2;
   
-  // Hexágono rotado 90 grados (más alto que ancho)
-  const points = [
-    { x: 0, y: -halfHeight },           // Top
-    { x: halfWidth * 0.866, y: -halfHeight * 0.5 },  // Top-right
-    { x: halfWidth * 0.866, y: halfHeight * 0.5 },   // Bottom-right
-    { x: 0, y: halfHeight },            // Bottom
-    { x: -halfWidth * 0.866, y: halfHeight * 0.5 },  // Bottom-left
-    { x: -halfWidth * 0.866, y: -halfHeight * 0.5 }  // Top-left
-  ];
-  
-  for (const point of points) {
-    const lat = centerLat + (point.y * 0.0001);
-    const lng = centerLng + (point.x * 0.0001);
+  // Hexágono perfecto con 6 vértices
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 3) * i; // 60 grados por vértice
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    
+    const lat = centerLat + (y * 0.0001);
+    const lng = centerLng + (x * 0.0001);
     coordinates.push({ latitude: lat, longitude: lng });
   }
   
   return coordinates;
 };
 
-// Función para generar malla hexagonal basada en el patrón CSS (12x14)
+// Función para generar malla hexagonal de panal de abeja perfecto
 const generateHoneycombGrid = (centerLat, centerLng) => {
   const hexagons = [];
   const rows = 12;
   const cols = 14;
-  const hexWidth = 63.26;
-  const hexHeight = 73.05;
   
-  // Conversión de píxeles a coordenadas geográficas
-  const latStep = 0.0008;  // Ajuste para el espaciado vertical
-  const lngStep = 0.0006;  // Ajuste para el espaciado horizontal
+  // Radio del hexágono (basado en las dimensiones CSS)
+  const hexRadius = 0.003; // Radio en grados geográficos
+  
+  // Espaciado para panal de abeja perfecto
+  const hexWidth = hexRadius * 2; // Ancho del hexágono
+  const hexHeight = hexRadius * Math.sqrt(3); // Altura del hexágono
   
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      // Patrón de offset para hexágonos (cada fila alterna)
-      const offsetX = (row % 2) * (hexWidth * 0.5);
-      const x = col * hexWidth + offsetX;
-      const y = row * hexHeight;
+      // Cálculo de posición para panal de abeja
+      const x = col * hexWidth * 0.75; // 75% del ancho para solapamiento
+      const y = row * hexHeight + (col % 2) * hexHeight / 2; // Offset alternado
       
-      const lat = centerLat + (y * latStep);
-      const lng = centerLng + (x * lngStep);
+      const lat = centerLat + y;
+      const lng = centerLng + x;
       
       // Asignar demanda basada en el patrón del CSS
       let demand = 'Baja';
@@ -81,11 +74,10 @@ const generateHoneycombGrid = (centerLat, centerLng) => {
         id: `hex_${row}_${col}`,
         level: demand,
         color: getDemandColor(demand, intensity),
-        coordinates: generateHexagon(lat, lng, hexWidth, hexHeight),
+        coordinates: generateHexagon(lat, lng, hexRadius),
         intensity: intensity,
         center: { latitude: lat, longitude: lng },
-        width: hexWidth,
-        height: hexHeight
+        radius: hexRadius
       });
     }
   }
