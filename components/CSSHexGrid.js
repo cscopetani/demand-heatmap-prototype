@@ -1,10 +1,67 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const CSSHexGrid = () => {
+  const mapRef = useRef(null);
+  const [map, setMap] = useState(null);
+
+  useEffect(() => {
+    const loadLeaflet = () => {
+      if (window.L) {
+        initializeMap();
+      } else {
+        // Load Leaflet CSS
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+
+        // Load Leaflet JS
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = () => {
+          initializeMap();
+        };
+        document.head.appendChild(script);
+      }
+    };
+
+    const initializeMap = () => {
+      const mapElement = mapRef.current;
+      if (!mapElement) return;
+
+      if (mapElement._leaflet_id) {
+        return;
+      }
+
+      const leafletMap = window.L.map(mapElement).setView([-34.6037, -58.3816], 13);
+
+      window.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors © CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20
+      }).addTo(leafletMap);
+
+      setMap(leafletMap);
+    };
+
+    loadLeaflet();
+
+    return () => {
+      if (map) {
+        map.remove();
+        setMap(null);
+      }
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
-      <div className="hex-grid">
+      {/* Mapa de fondo */}
+      <div ref={mapRef} style={styles.map} />
+      
+      {/* Malla hexagonal superpuesta */}
+      <div className="hex-grid" style={styles.hexOverlay}>
         <ul className="hex-grid__list">
           {/* Generar 168 hexágonos (12x14) */}
           {Array.from({ length: 168 }, (_, index) => {
@@ -95,22 +152,25 @@ const CSSHexGrid = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    position: 'relative'
+    position: 'relative',
+    backgroundColor: '#f5f5f5'
   },
-  hexGrid: {
+  map: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    padding: '20px',
-    gap: '0',
-    overflow: 'hidden'
+    zIndex: 1
+  },
+  hexOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 2,
+    pointerEvents: 'none'
   },
   legend: {
     position: 'absolute',

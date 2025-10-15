@@ -3,8 +3,9 @@
   display: flex;
   justify-content: center;
   padding: 20px;
-  background: #f5f5f5;
+  background: transparent;
   min-height: 100vh;
+  pointer-events: none;
 }
 
 .hex-grid__list {
@@ -23,11 +24,12 @@
   position: relative;
   grid-column: 1 / span 3;
   grid-row: calc(var(--counter) + var(--counter)) / span 2;
-  filter: drop-shadow(0 0 10px rgba(68, 68, 68, 0.08));
+  filter: drop-shadow(0 0 10px rgba(68, 68, 68, 0.15));
   height: 0;
   padding-bottom: 90%;
   cursor: pointer;
   transition: transform 0.24s ease-out;
+  pointer-events: auto;
 }
 
 .hex-grid__item:hover {
